@@ -72,14 +72,11 @@ export const googleLogin = async (req, res) => {
       });
     }
 
-    // Verify Firebase Token
    const decodedToken = await auth.verifyIdToken(firebaseToken);
     const { uid, email, name, picture } = decodedToken;
 
-    // Check if user exists
     let user = await User.findOne({ email });
 
-    // Create user if not exists
     if (!user) {
   user = await User.create({
     name,
@@ -95,8 +92,6 @@ export const googleLogin = async (req, res) => {
 
   await user.save();
 }
-
-    // Return Backend JWT
     res.status(200).json({
       success: true,
       token: generateToken(user._id),

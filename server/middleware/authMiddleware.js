@@ -1,51 +1,48 @@
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 
-const protect = async (req, res,next) => {
-  let token;
-  if (
-    req.headers.authorization &&
-    req.headers.authorization.startsWith(
-      "Bearer"
-    )
-  ) {
+const protect = async (req, res, next) => {
     try {
-      token =
-        req.headers.authorization.split(
-          " "
-        )[1];
-const decoded = jwt.verify(
-  token,
-  process.env.JWT_SECRET
-);
+        const authHeader = req.headers.authorization;
 
-console.log("Decoded:", decoded);
+        console.log("AUTH HEADER:", authHeader ? "Received" : "Missing");
 
-const user = await User.findById(decoded.id);
+        if (!authHeader || !authHeader.startsWith("Bearer ")) {
+            return res.status(401).json({
+                message: "No token",
+            });
+        }
 
-console.log("User from DB:", user);
+        const token = authHeader.split(" ")[1];
 
-req.user = user?.select ? await User.findById(decoded.id).select("-password") : user;
+        const decoded = jwt.verify(
+            token,
+            process.env.JWT_SECRET
+        );
 
-if (!req.user) {
-  return res.status(401).json({
-    message: "User not found. Please login again.",
-  });
-}
+        console.log("DECODED USER ID:", decoded.id);
 
-next();
+        const user = await User.findById(decoded.id).select("-password");
+
+        console.log("USER FOUND:", !!user);
+
+        if (!user) {
+            return res.status(401).json({
+                message: "User not found",
+            });
+        }
+
+        req.user = user;
+
+        next();
+
     } catch (error) {
-      res.status(401).json({
-        message: "Not authorized",
-      });
-    }
-  }
+        console.log("AUTH ERROR:", error.message);
 
-  if (!token) {
-    res.status(401).json({
-      message: "No token",
-    });
-  }
+        return res.status(401).json({
+            message: error.message,
+        });
+    }
 };
 
 export default protect;

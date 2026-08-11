@@ -31,13 +31,13 @@ app.use(
 // Test Route
 app.get("/api/test", (req, res) => {
   res.json({
-    message: "API is working 🚀",
+    message: "API is working ",
   });
 });
 
 app.get("/", (req, res) => {
   res.json({
-    message: "HackFlow Backend Running 🚀",
+    message: "HackFlow Backend Running ",
   });
 });
 
@@ -45,7 +45,7 @@ const PORT = process.env.PORT || 4000;
 
 console.log(
   "Groq Key Loaded:",
-  process.env.GROQ_API_KEY ? "YES ✅" : "NO ❌"
+  process.env.GROQ_API_KEY ? "YES " : "NO "
 );
 
 import http from "http";

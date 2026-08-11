@@ -126,6 +126,11 @@ const projectSchema = new mongoose.Schema(
           default: "todo",
         },
         priority: String,
+        mvpCategory: {
+          type: String,
+          enum: ["Must Have", "Should Have", "Cut for Now", null],
+          default: null,
+        },
       },
     ],
 
@@ -144,6 +149,31 @@ const projectSchema = new mongoose.Schema(
         description: String,
       },
     ],
+    mvpPlan: {
+      summary: String,
+      recommendedTaskCount: Number,
+      currentTaskCount: Number,
+      availableDays: Number,
+      risk: String,
+      mustHave: [
+        {
+          title: String,
+          reason: String,
+        },
+      ],
+      shouldHave: [
+        {
+          title: String,
+          reason: String,
+        },
+      ],
+      cutForNow: [
+        {
+          title: String,
+          reason: String,
+        },
+      ],
+    },
 
     futureScope: [String],
   },

@@ -98,6 +98,7 @@ localStorage.setItem(
       "user",
       JSON.stringify(response.data.user)
     );
+    window.dispatchEvent(new Event("authTokenReady"));
 
     alert("Google Login Successful!");
 
@@ -132,6 +133,9 @@ localStorage.setItem(
       "user",
       JSON.stringify(response.data.user)
     );
+
+    window.dispatchEvent(new Event("authTokenReady"));
+
 
     alert("GitHub Login Successful!");
 

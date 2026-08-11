@@ -1,8 +1,8 @@
 import {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
+    createContext,
+    useContext,
+    useEffect,
+    useState,
 } from "react";
 
 import { getNotifications } from "../api/notificationApi";
@@ -11,81 +11,89 @@ import { useSocket } from "./SocketContext";
 const NotificationContext = createContext();
 
 export const NotificationProvider = ({ children }) => {
+    const socket = useSocket();
 
-  const socket = useSocket();
+    const [notifications, setNotifications] = useState([]);
 
-  const [notifications, setNotifications] = useState([]);
+    const loadNotifications = async () => {
+        const token = localStorage.getItem("token");
 
-  useEffect(() => {
-    loadNotifications();
-  }, []);
+        if (!token) {
+            console.log("No token yet");
+            return;
+        }
 
-  const loadNotifications = async () => {
-    try {
-      const data = await getNotifications();
-      setNotifications(data);
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  useEffect(() => {
-
-    if (!socket) return;
-
-    socket.on("newNotification", (notification) => {
-
-      setNotifications(prev => [
-        notification,
-        ...prev,
-      ]);
-
-    });
-
-    return () => {
-      socket.off("newNotification");
+        try {
+            const data = await getNotifications();
+            setNotifications(data || []);
+        } catch (error) {
+            console.log("Notification error:", error);
+        }
     };
 
-  }, [socket]);
-  useEffect(() => {
-  console.log("Socket:", socket);
+    useEffect(() => {
+        // In case user is already logged in
+        loadNotifications();
 
-  if (!socket) return;
+        // For login happening after app has mounted
+        const handleTokenReady = () => {
+            console.log("Token ready → loading notifications");
+            loadNotifications();
+        };
 
-  socket.on("connect", () => {
-    console.log("Socket Connected:", socket.id);
-  });
+        window.addEventListener(
+            "authTokenReady",
+            handleTokenReady
+        );
 
-  socket.on("newNotification", (notification) => {
-    console.log("Notification Received:", notification);
+        return () => {
+            window.removeEventListener(
+                "authTokenReady",
+                handleTokenReady
+            );
+        };
+    }, []);
 
-    setNotifications((prev) => [
-      notification,
-      ...prev,
-    ]);
-  });
+    useEffect(() => {
+        if (!socket) return;
 
-  return () => {
-    socket.off("connect");
-    socket.off("newNotification");
-  };
-}, [socket]);
+        const handleNotification = (notification) => {
+            setNotifications((prev) => [
+                notification,
+                ...prev,
+            ]);
+        };
 
-  const unreadCount =
-    notifications.filter(n => !n.isRead).length;
+        socket.on(
+            "newNotification",
+            handleNotification
+        );
 
-  return (
-    <NotificationContext.Provider
-      value={{
-        notifications,
-        unreadCount,
-        setNotifications,
-      }}
-    >
-      {children}
-    </NotificationContext.Provider>
-  );
+        return () => {
+            socket.off(
+                "newNotification",
+                handleNotification
+            );
+        };
+    }, [socket]);
+
+    const unreadCount = notifications.filter(
+        (notification) => !notification.isRead
+    ).length;
+
+    return (
+        <NotificationContext.Provider
+            value={{
+                notifications,
+                unreadCount,
+                setNotifications,
+                loadNotifications,
+            }}
+        >
+            {children}
+        </NotificationContext.Provider>
+    );
 };
 
 export const useNotifications = () =>
-  useContext(NotificationContext);
+    useContext(NotificationContext);

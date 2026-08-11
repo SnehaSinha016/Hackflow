@@ -9,7 +9,7 @@ export const sendNotification = async ({
   data = {},
 }) => {
   const notification = await Notification.create({
-    user,
+    owner: user,
     title,
     message,
     type,

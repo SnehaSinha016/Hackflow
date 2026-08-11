@@ -48,7 +48,6 @@ const Login = () => {
         email: response.data.email,
       })
     );
-
     console.log("TOKEN AFTER SAVE:", localStorage.getItem("token"));
 
     alert("Login Successful!");
@@ -88,6 +87,7 @@ const Login = () => {
       "user",
       JSON.stringify(response.data.user)
     );
+    window.dispatchEvent(new Event("authTokenReady"));
 
     alert("Google Login Successful!");
 

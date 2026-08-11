@@ -3,6 +3,7 @@ import { chatWithAI } from "../services/aiService.js";
 import buildIdeaPrompt from "../prompts/ideaPrompt.js";
 import buildManualPlannerPrompt from "../prompts/manualPlannerPrompt.js";
 import buildGeneratedPlannerPrompt from "../prompts/generatedPlannerPrompt.js";
+import buildMVPOptimizerPrompt from "../prompts/mvpOptimizerPrompt.js";
 
 const cleanJSON = (text) => {
   return text
@@ -116,5 +117,24 @@ export const generateAIProject = async (req, res) => {
       message: "Failed to generate AI project",
     });
 
+  }
+};
+export const optimizeMVP = async (req, res) => {
+  try {
+    const prompt = buildMVPOptimizerPrompt(req.body);
+    const response = await chatWithAI(prompt);
+    const plan = JSON.parse(cleanJSON(response));
+
+    res.json({
+      success: true,
+      plan,
+    });
+  } catch (err) {
+    console.error("MVP OPTIMIZER ERROR:", err);
+
+    res.status(500).json({
+      success: false,
+      message: err.message || "Failed to optimize MVP",
+    });
   }
 };

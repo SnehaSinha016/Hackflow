@@ -7,6 +7,7 @@ import {
   Plug,
   Sparkles,
   BarChart3,
+  Target,
 } from "lucide-react";
 
 const ProjectTabs = ({
@@ -37,6 +38,11 @@ const ProjectTabs = ({
       id: "planner",
       label: "AI Assistant",
       icon: Sparkles,
+    },
+    {
+      id: "mvp",
+      label: "MVP Optimizer",
+      icon: Target,
     },
   ];
 

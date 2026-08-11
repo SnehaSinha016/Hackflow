@@ -8,6 +8,8 @@ import ProjectBlueprint from "../ProjectBlueprint/ProjectBlueprint";
 import Roadmap from "../ProjectBlueprint/Roadmap";
 import Tasks from "../ProjectBlueprint/Tasks";
 import APIs from "../ProjectBlueprint/APIS";
+import MVPOptimizer from "./MVPOptimizer"
+import AIAssistant from "./AIAssistant";
 
 const ProjectDetails = () => {
 
@@ -90,6 +92,14 @@ useEffect(() => {
     <Roadmap roadmap={project.roadmap} />
   </div>
 )}
+{activeTab === "mvp" && (
+        <div className="mt-8">
+          <MVPOptimizer
+            project={project}
+            setProject={setProject}
+          />
+        </div>
+      )}
 
     </div>
   );
